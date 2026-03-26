@@ -15,7 +15,7 @@ import anthropic
 
 from taxonomy import artifact_for_label, extract_label
 
-DEFAULT_JUDGE_MODEL = "claude-sonnet-4-20250514"
+DEFAULT_JUDGE_MODEL = "claude-opus-4-6"
 
 
 @dataclass
