@@ -1,0 +1,402 @@
+.message-bubble {
+  display: flex;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-6);
+  animation: message-enter var(--dur) var(--ease-out);
+}
+
+@keyframes message-enter {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Avatar hidden by default — claude.ai doesn't badge
+   every turn. Subagent messages opt back in below. */
+.message-avatar {
+  display: none;
+}
+
+ .message-bubble.subagent .message-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  border-radius: var(--radius-sm);
+  background: var(--bg-tertiary);
+  color: var(--info);
+}
+
+.message-content {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ── User — right-aligned speech bubble ──────────
+   claude.ai treatment: no avatar, compact bubble,
+   max ~78% width, generous uniform radius.
+   ─────────────────────────────────────────────── */
+
+.message-bubble.user {
+  justify-content: flex-end;
+  padding-block: var(--space-2);
+}
+
+.message-bubble.user .message-avatar {
+  display: none;
+}
+
+.message-bubble.user .message-content {
+  flex: 0 1 auto;
+  max-width: 78%;
+  padding: var(--space-3) var(--space-4);
+  background: var(--user-message-bg);
+  border-radius: 18px;
+}
+
+.message-bubble.user .text-content {
+  font-size: 14.5px;
+  line-height: 1.55;
+}
+
+/* Code blocks inside user bubbles need a darker surface
+   since the bubble itself is already elevated. */
+.message-bubble.user .markdown-content pre,
+.message-bubble.user .markdown-content code {
+  background: var(--bg-primary);
+}
+
+/* ── Assistant — flows on canvas ─────────────────
+   Avatar + prose, no bubble.
+   ─────────────────────────────────────────────── */
+
+.message-bubble.assistant {
+  background: transparent;
+  padding-block: var(--space-4);
+}
+
+/* Agentic loops emit one assistant bubble per tool round-trip. Collapse the
+   padding between adjacent ones so sequential tools read as a single run. */
+.message-bubble.assistant:has(+ .message-bubble.assistant) {
+  padding-bottom: var(--space-2);
+}
+.message-bubble.assistant + .message-bubble.assistant {
+  padding-top: var(--space-2);
+}
+
+/* Trim outer tool-block margins — bubble padding is the separator. */
+.message-content > .tool-call-block:first-child,
+.message-content > .tool-call-group:first-child { margin-top: 0; }
+.message-content > .tool-call-block:last-child,
+.message-content > .tool-call-group:last-child  { margin-bottom: 0; }
+
+.text-content {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--text-primary);
+  word-break: break-word;
+}
+
+.text-content.markdown-content {
+  white-space: normal;
+}
+
+/* ── Subagent indent ────────────────────────────── */
+
+.message-bubble.subagent {
+  margin-left: var(--space-6);
+  padding-left: var(--space-4);
+  border-left: 1px solid var(--border);
+  position: relative;
+}
+
+.message-bubble.subagent::before {
+  content: 'Subagent';
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-4);
+  font-family: var(--font-sans);
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: var(--bg-tertiary);
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-sm);
+}
+
+/* ── Error banner ───────────────────────────────── */
+
+.message-error {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  margin-bottom: var(--space-3);
+  background: color-mix(in srgb, var(--error) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--error) 30%, transparent);
+  border-radius: var(--radius-sm);
+  color: var(--error);
+  font-size: 13px;
+}
+
+/* ── System messages ────────────────────────────── */
+
+.message-bubble.system {
+  justify-content: center;
+  background: transparent;
+  padding: var(--space-3) var(--space-5);
+}
+
+.system-content {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  color: var(--text-muted);
+  text-align: center;
+  padding: var(--space-2) var(--space-4);
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-pill);
+}
+
+/* ── Result summary card ────────────────────────── */
+
+.message-bubble.result {
+  justify-content: center;
+  background: transparent;
+  padding: var(--space-3) var(--space-5);
+}
+
+.result-content {
+  width: 100%;
+  max-width: 520px;
+  padding: var(--space-5);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.result-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-serif);
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--success);
+  margin-bottom: var(--space-4);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--border);
+}
+
+.result-header .error-icon,
+.result-header:has(.error-icon) {
+  color: var(--error);
+}
+
+.result-stats {
+  display: flex;
+  gap: var(--space-6);
+  flex-wrap: wrap;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.stat-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.stat-value {
+  font-family: var(--font-serif);
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.result-text {
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--border);
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.result-text.markdown-content {
+  white-space: normal;
+}
+
+/* ── Standalone tool result (edge case) ─────────── */
+
+.tool-result-standalone {
+  margin: var(--space-2) 0;
+  padding: var(--space-3);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.tool-result-standalone.error {
+  border-color: color-mix(in srgb, var(--error) 30%, var(--border));
+}
+
+.tool-result-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+  margin-bottom: var(--space-1);
+}
+
+.tool-result-content {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-secondary);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* ══════════════════════════════════════════════════
+   Markdown — serif headings, terracotta links,
+   warm code blocks
+   ══════════════════════════════════════════════════ */
+
+.markdown-content {
+  line-height: 1.65;
+}
+
+.markdown-content p {
+  margin: 0 0 0.9em;
+}
+.markdown-content p:last-child {
+  margin-bottom: 0;
+}
+
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3,
+.markdown-content h4,
+.markdown-content h5,
+.markdown-content h6 {
+  margin: 1.4em 0 0.5em;
+  font-family: var(--font-serif);
+  font-weight: 500;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+.markdown-content h1:first-child,
+.markdown-content h2:first-child,
+.markdown-content h3:first-child {
+  margin-top: 0;
+}
+
+.markdown-content h1 { font-size: 1.5em; }
+.markdown-content h2 { font-size: 1.3em; }
+.markdown-content h3 { font-size: 1.15em; }
+.markdown-content h4 { font-size: 1em; }
+
+.markdown-content code {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  padding: 0.15em 0.4em;
+  background: var(--bg-tertiary);
+  border-radius: 4px;
+  color: var(--text-primary);
+}
+
+.markdown-content pre {
+  margin: 0.9em 0;
+  padding: var(--space-4);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow-x: auto;
+}
+
+.markdown-content pre code {
+  background: transparent;
+  padding: 0;
+  font-size: 13px;
+  color: var(--text-primary);
+}
+
+.markdown-content ul,
+.markdown-content ol {
+  margin: 0.5em 0;
+  padding-left: 1.5em;
+}
+
+.markdown-content li {
+  margin: 0.25em 0;
+}
+
+.markdown-content li::marker {
+  color: var(--text-muted);
+}
+
+.markdown-content blockquote {
+  margin: 0.9em 0;
+  padding: var(--space-2) var(--space-4);
+  border-left: 2px solid var(--accent);
+  color: var(--text-secondary);
+}
+
+.markdown-content blockquote p {
+  margin: 0;
+}
+
+.markdown-content a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--accent) 40%, transparent);
+  text-underline-offset: 2px;
+  transition: text-decoration-color var(--dur-fast) var(--ease);
+}
+
+.markdown-content a:hover {
+  text-decoration-color: var(--accent);
+}
+
+.markdown-content hr {
+  margin: 1.5em 0;
+  border: none;
+  border-top: 1px solid var(--border);
+}
+
+.markdown-content table {
+  width: 100%;
+  margin: 0.9em 0;
+  border-collapse: collapse;
+  font-size: 0.93em;
+}
+
+.markdown-content th,
+.markdown-content td {
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+
+.markdown-content th {
+  font-weight: 500;
+  color: var(--text-secondary);
+  font-size: 0.9em;
+}
+
+.markdown-content img {
+  max-width: 100%;
+  border-radius: var(--radius-sm);
+}
+
+.markdown-content strong {
+  font-weight: 600;
+  color: var(--text-primary);
+}

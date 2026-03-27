@@ -1,0 +1,172 @@
+/* Salesforce-Setup-style readout for .agent files.
+   Intentionally light-theme so it reads like the Agent Definition page
+   admins already know, regardless of the surrounding app theme. */
+
+.slds-agent {
+  background: #fff;
+  color: #181818;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  padding: 24px 28px;
+  line-height: 1.5;
+  font-size: 13px;
+}
+
+/* ── Page header ─────────────────────────────── */
+.slds-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.slds-header-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: #747474;
+  color: #fff;
+  border-radius: 6px;
+}
+.slds-header h1 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+/* ── Section ─────────────────────────────────── */
+.slds-section { margin-bottom: 28px; }
+.slds-section h2 {
+  margin: 0 0 12px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #032d60;
+}
+.slds-section-help {
+  margin: 0 0 12px;
+  color: #444;
+}
+
+/* ── Fields ──────────────────────────────────── */
+.slds-field-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 32px;
+  margin-bottom: 16px;
+}
+.slds-field-full { margin-bottom: 16px; }
+.slds-field-label {
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.slds-field-value {
+  font-size: 13px;
+  color: #181818;
+  word-break: break-word;
+}
+.slds-required {
+  color: #c23934;
+  margin-right: 2px;
+}
+.slds-info-icon {
+  color: #747474;
+  margin-left: 2px;
+}
+
+/* ── Table ───────────────────────────────────── */
+.slds-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #dddbda;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.slds-table th {
+  text-align: left;
+  background: #f3f2f2;
+  border-bottom: 1px solid #dddbda;
+  padding: 10px 14px;
+  font-weight: 600;
+  font-size: 13px;
+}
+.slds-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #eeedec;
+  vertical-align: top;
+}
+.slds-table tbody tr:last-child td { border-bottom: none; }
+.slds-table code {
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 12px;
+}
+
+/* ── Topic cell ──────────────────────────────── */
+.slds-topic-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 13px;
+}
+.slds-topic-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  background: #0176d3;
+  color: #fff;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+.slds-row-expandable { cursor: pointer; }
+.slds-row-expandable:hover { background: #f8f8f8; }
+
+/* ── Expanded detail ─────────────────────────── */
+.slds-detail-row td {
+  background: #fafaf9;
+  padding: 12px 14px 16px 44px;
+}
+.slds-detail-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #747474;
+  margin: 8px 0 4px;
+}
+.slds-detail-label:first-child { margin-top: 0; }
+.slds-instructions {
+  margin: 0 0 8px;
+  padding-left: 18px;
+  font-size: 13px;
+}
+.slds-instructions li { margin-bottom: 2px; }
+.slds-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.slds-action {
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 10px;
+  background: #eef4ff;
+  border: 1px solid #c9dcf7;
+}
+.slds-action-apex       { background: #fff4e5; border-color: #f5c77e; }
+.slds-action-transition { background: #e8f5e9; border-color: #a5d6a7; }
+.slds-action-prompt     { background: #f3e8ff; border-color: #d8b4fe; }
+
+/* ── Pills ───────────────────────────────────── */
+.slds-pill {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: #e8e8e8;
+  color: #444;
+  margin-left: 4px;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+}

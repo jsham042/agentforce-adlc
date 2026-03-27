@@ -1,0 +1,24 @@
+.mcp-app-frame-container {
+  position: relative;
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.mcp-app-iframe {
+  width: 100%;
+  display: block;
+  border: none;
+  background: transparent;
+  transition: height var(--dur) var(--ease);
+}
+
+.mcp-app-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-secondary);
+  color: var(--text-muted);
+  font-size: 12px;
+}

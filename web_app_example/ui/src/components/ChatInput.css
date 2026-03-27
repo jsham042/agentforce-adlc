@@ -1,0 +1,175 @@
+.chat-input-container {
+  padding: var(--space-4) var(--space-6) var(--space-6);
+  background: var(--bg-primary);
+  border-top: 1px solid var(--border);
+}
+
+.chat-input-wrapper {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  transition: border-color var(--dur) var(--ease),
+              background var(--dur) var(--ease);
+}
+
+.chat-input-wrapper:focus-within {
+  border-color: var(--border-strong);
+  background: var(--bg-secondary);
+}
+
+.chat-input {
+  flex: 1;
+  min-height: 36px;
+  max-height: 200px;
+  padding: var(--space-2) 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  resize: none;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+
+.chat-input::placeholder {
+  color: var(--text-muted);
+}
+
+.chat-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Send button — round, terracotta, sits inside the input pill */
+.chat-send-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  background: var(--accent);
+  border: none;
+  border-radius: var(--radius-pill);
+  color: #fff;
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease),
+              transform var(--dur-fast) var(--ease);
+}
+
+.chat-send-button:hover:not(:disabled) {
+  background: var(--accent-hover);
+}
+
+.chat-send-button:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+.chat-send-button:disabled {
+  background: var(--bg-elevated);
+  color: var(--text-muted);
+  cursor: not-allowed;
+}
+
+.chat-send-button .icon.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.chat-input-hint {
+  margin-top: var(--space-2);
+  font-size: 11px;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+/* --- attachments ----------------------------------------------------- */
+
+.chat-file-input {
+  display: none;
+}
+
+/* Paperclip — sits left of textarea, styled as a quiet sibling to the
+   terracotta send button on the right. */
+.chat-attach-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-pill);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease),
+              color var(--dur-fast) var(--ease);
+}
+
+.chat-attach-button:hover:not(:disabled) {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+}
+
+.chat-attach-button:disabled {
+  cursor: wait;
+}
+
+.chat-attachment-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+.chat-attachment-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 4px 6px 4px 8px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* Dashed border = not on the server yet, bundled with next Send */
+.chat-attachment-chip.staged {
+  border-style: dashed;
+}
+
+.chat-attachment-chip .chip-name {
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chip-dismiss {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-pill);
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.chip-dismiss:hover {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+}

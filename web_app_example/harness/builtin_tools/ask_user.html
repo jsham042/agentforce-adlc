@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: transparent;
+      color: #181818;
+      font-size: 13px;
+    }
+    .card {
+      background: #fff;
+      border: 1px solid #dddbda;
+      border-radius: 6px;
+      padding: 16px 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    }
+    .label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #747474;
+      margin-bottom: 12px;
+    }
+
+    /* One block per question */
+    .qblock { margin-bottom: 20px; }
+    .qblock:last-of-type { margin-bottom: 10px; }
+    .qblock.skipped .option, .qblock.skipped .question { opacity: 0.4; }
+    .qhead {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .question { font-size: 14px; line-height: 1.5; flex: 1; font-weight: 600; }
+    .skip-btn {
+      background: #fff;
+      border: 1px solid #dddbda;
+      color: #747474;
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .skip-btn:hover { border-color: #c9c7c5; color: #181818; }
+    .qblock.skipped .skip-btn { border-color: #0176d3; color: #0176d3; }
+
+    /* Multiple choice */
+    .option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      margin-bottom: 6px;
+      border: 1px solid #dddbda;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .option:hover { border-color: #0176d3; background: rgba(1,118,211,0.06); }
+    .option.selected { border-color: #0176d3; background: rgba(1,118,211,0.10); }
+    .radio {
+      width: 16px; height: 16px;
+      border-radius: 50%;
+      border: 2px solid #c9c7c5;
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .option.selected .radio { border-color: #0176d3; }
+    .option.selected .radio::after {
+      content: ''; width: 8px; height: 8px;
+      border-radius: 50%; background: #0176d3;
+    }
+    .option input[type="text"] {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: #181818;
+      font-family: inherit;
+      font-size: 13px;
+      padding: 0;
+    }
+    .option input[type="text"]:focus { outline: none; }
+    .option input[type="text"]::placeholder { color: #747474; }
+
+    /* Submit */
+    .submit-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      margin-top: 10px;
+      background: #0176d3;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .submit-btn:hover { background: #014486; }
+    .submit-btn:disabled { background: #c9c7c5; cursor: default; }
+
+    /* Submitted state */
+    .submitted-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #2e844a;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .submitted-answer {
+      color: #444;
+      font-style: italic;
+      white-space: pre-line;
+    }
+    .empty { color: #747474; text-align: center; padding: 24px; }
+  </style>
+</head>
+<body>
+  <div id="root" class="empty">Waiting for data...</div>
+
+  <script>
+    let initialized = false;
+    let submitted = false;
+    let questions = [];
+    // answers[q] = {kind: 'option', idx} | {kind: 'other'} | {kind: 'skip'} | null
+    let answers = [];
+
+    // ---- MCP Apps postMessage protocol (JSON-RPC 2.0) ----
+
+    window.addEventListener('message', (ev) => {
+      const msg = ev.data;
+      if (!msg?.jsonrpc) return;
+
+      if (msg.method === 'ui/notifications/tool-input') {
+        loadQuestions(msg.params?.arguments);
+      }
+      if (msg.method === 'ui/notifications/tool-result' && !questions.length) {
+        const text = extractText(msg.params?.result);
+        const m = text.match(/<!--DATA:(.+?)-->/s);
+        if (m) {
+          try { loadQuestions(JSON.parse(m[1])); } catch {}
+        }
+      }
+      // Host says this was already answered (session rehydration).
+      if (msg.method === 'ui/notifications/answered') {
+        renderSubmitted(msg.params?.text || '');
+      }
+    });
+
+    window.parent.postMessage({ jsonrpc: '2.0', id: 1, method: 'ui/initialize', params: {} }, '*');
+    window.addEventListener('message', function onInit(ev) {
+      if (ev.data?.jsonrpc === '2.0' && ev.data.id === 1 && !initialized) {
+        initialized = true;
+        window.removeEventListener('message', onInit);
+        window.parent.postMessage({ jsonrpc: '2.0', method: 'ui/notifications/initialized' }, '*');
+      }
+    });
+
+    // ---- Rendering ----
+
+    function loadQuestions(data) {
+      if (submitted || !data) return;
+      let qs = data.questions;
+      if (typeof qs === 'string') {
+        try { qs = JSON.parse(qs); } catch { qs = []; }
+      }
+      if (!Array.isArray(qs) || !qs.length) return;
+      questions = qs.map(q => ({
+        question: String(q.question || ''),
+        options: Array.isArray(q.options) ? q.options.map(optLabel) : [],
+      }));
+      answers = questions.map(() => null);
+      renderForm();
+    }
+
+    function renderForm() {
+      const root = document.getElementById('root');
+      root.className = '';
+
+      const label = questions.length === 1 ? 'Question' : `${questions.length} Questions`;
+      const blocks = questions.map((q, qi) => {
+        const OTHER = q.options.length;
+        const opts = q.options.map((opt, i) =>
+          `<div class="option" onclick="pick(${qi},${i})">` +
+            `<div class="radio"></div><div>${esc(opt)}</div>` +
+          `</div>`
+        ).join('') +
+          `<div class="option" onclick="pick(${qi},${OTHER})">` +
+            `<div class="radio"></div>` +
+            `<input type="text" id="other-${qi}" placeholder="Other — type your own…" ` +
+              `onclick="event.stopPropagation()" oninput="onOther(${qi})">` +
+          `</div>`;
+        return (
+          `<div class="qblock" id="q-${qi}">` +
+            `<div class="qhead">` +
+              `<div class="question">${esc(q.question)}</div>` +
+              `<button class="skip-btn" onclick="toggleSkip(${qi})">Skip</button>` +
+            `</div>` +
+            opts +
+          `</div>`
+        );
+      }).join('');
+
+      root.innerHTML =
+        `<div class="card">` +
+          `<div class="label">${label}</div>` +
+          blocks +
+          `<button class="submit-btn" id="submit-btn" onclick="submit()" disabled>Submit</button>` +
+        `</div>`;
+    }
+
+    function pick(qi, i) {
+      if (submitted) return;
+      const OTHER = questions[qi].options.length;
+      answers[qi] = i === OTHER ? {kind: 'other'} : {kind: 'option', idx: i};
+      paint(qi);
+    }
+
+    function onOther(qi) {
+      const ta = document.getElementById(`other-${qi}`);
+      if (ta.value.trim()) answers[qi] = {kind: 'other'};
+      paint(qi);
+    }
+
+    function toggleSkip(qi) {
+      if (submitted) return;
+      answers[qi] = answers[qi]?.kind === 'skip' ? null : {kind: 'skip'};
+      paint(qi);
+    }
+
+    function paint(qi) {
+      const block = document.getElementById(`q-${qi}`);
+      const a = answers[qi];
+      block.classList.toggle('skipped', a?.kind === 'skip');
+      block.querySelector('.skip-btn').textContent = a?.kind === 'skip' ? 'Skipped' : 'Skip';
+      const OTHER = questions[qi].options.length;
+      const sel = a?.kind === 'option' ? a.idx : a?.kind === 'other' ? OTHER : -1;
+      block.querySelectorAll('.option').forEach((el, j) => {
+        el.classList.toggle('selected', j === sel);
+      });
+      updateSubmit();
+    }
+
+    function resolved(qi) {
+      const a = answers[qi];
+      if (!a) return false;
+      if (a.kind === 'skip' || a.kind === 'option') return true;
+      return !!document.getElementById(`other-${qi}`)?.value.trim();
+    }
+
+    function updateSubmit() {
+      document.getElementById('submit-btn').disabled =
+        !questions.every((_, qi) => resolved(qi));
+    }
+
+    function submit() {
+      if (submitted || !questions.every((_, qi) => resolved(qi))) return;
+      submitted = true;
+
+      const lines = questions.map((q, qi) => {
+        const a = answers[qi];
+        let val;
+        if (a.kind === 'skip') val = '(skipped)';
+        else if (a.kind === 'option') val = q.options[a.idx];
+        else val = document.getElementById(`other-${qi}`).value.trim();
+        return questions.length === 1 ? val : `Q${qi + 1}: ${val}`;
+      });
+      const answer = lines.join('\n');
+
+      window.parent.postMessage({
+        jsonrpc: '2.0',
+        method: 'ui/submit-response',
+        params: { text: answer },
+      }, '*');
+
+      renderSubmitted(answer);
+    }
+
+    function renderSubmitted(answer) {
+      submitted = true;
+      document.getElementById('root').innerHTML =
+        `<div class="card">` +
+          `<div class="submitted-header">&#10003; Response submitted</div>` +
+          `<div class="submitted-answer">${esc(answer)}</div>` +
+        `</div>`;
+    }
+
+    // ---- Helpers ----
+
+    function extractText(result) {
+      const c = result?.content;
+      if (typeof c === 'string') return c;
+      if (Array.isArray(c) && c[0]?.text) return c[0].text;
+      return '';
+    }
+
+    function optLabel(o) {
+      if (o == null) return '';
+      if (typeof o === 'object') {
+        return String(o.label ?? o.text ?? o.value ?? o.name ?? JSON.stringify(o));
+      }
+      return String(o);
+    }
+
+    function esc(s) {
+      return String(s).replace(/[&<>"']/g, c =>
+        ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
+    }
+  </script>
+</body>
+</html>

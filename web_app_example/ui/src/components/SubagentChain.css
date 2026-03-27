@@ -1,0 +1,283 @@
+/* ══════════════════════════════════════════════════
+   Subagent threads — card container
+
+   Subagents are big events (whole delegated conversations),
+   so they get a proper surface. Tool blocks inside sit on
+   that surface with their own left rails.
+
+     main agent text
+     ┌─────────────────────────────────────┐
+     │ Subagent · researcher · Find…  ● Running │
+     │   ▸ Prompt                          │
+     │   ┃ tool call                       │
+     │   ┃ tool call                       │
+     │   ✨                                │
+     └─────────────────────────────────────┘
+     main agent continues
+
+   Multiple parallel subagents stack vertically under a light
+   "Subagents · N" collapse-all header.
+   ══════════════════════════════════════════════════ */
+
+/* ── Thread: one subagent, one card ─────────────── */
+
+/* Subagent color is --accent (terracotta) — matches TodoList.css where
+   main agent = --info and subagent = --accent. */
+.subagent-thread {
+  margin: var(--space-2) var(--space-6);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border));
+  border-radius: var(--radius);
+  animation: thread-enter var(--dur) var(--ease-out);
+}
+
+@keyframes thread-enter {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Thread header — text on canvas, no chrome ──── */
+
+.thread-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-1) 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  text-align: left;
+  color: var(--text-secondary);
+}
+
+.thread-header:hover .thread-label {
+  color: var(--text-primary);
+}
+
+.thread-chevron {
+  display: flex;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.thread-bot {
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.thread-kind {
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: capitalize;
+  color: var(--accent);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.thread-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-secondary);
+  transition: color var(--dur-fast) var(--ease);
+}
+
+.thread-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+
+.thread-tool-count {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 10px;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.thread-status.running {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--process);
+}
+
+.thread-status.running::before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--process);
+  animation: pulse-dot 1.4s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 0.35; }
+  50%      { opacity: 1; }
+}
+
+.thread-status.complete {
+  color: var(--success);
+}
+
+/* ── Thread body ────────────────────────────────── */
+
+.thread-body {
+  padding-top: var(--space-1);
+}
+
+/* Messages inside a thread already carry their own padding;
+   tighten it so the rail indent doesn't double up. */
+.thread-body .message-bubble {
+  padding: var(--space-2) 0;
+}
+
+.thread-body .message-bubble.subagent {
+  margin-left: 0;
+  padding-left: 0;
+  border-left: none;
+}
+
+.thread-body .message-bubble.subagent::before {
+  display: none;
+}
+
+/* The rail + header already say "subagent" — don't badge every
+   message inside with the Network icon too. */
+.thread-body .message-bubble.subagent .message-avatar {
+  display: none;
+}
+
+.thread-body .text-content {
+  font-size: 13px;
+}
+
+/* ── Dispatch prompt ────────────────────────────── */
+
+.thread-prompt {
+  margin-bottom: var(--space-3);
+}
+
+.thread-prompt-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) 0;
+  background: transparent;
+  border: none;
+  font-family: var(--font-sans);
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color var(--dur-fast) var(--ease);
+}
+
+.thread-prompt-toggle:hover {
+  color: var(--text-secondary);
+}
+
+.thread-prompt-body {
+  margin: var(--space-1) 0 var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  max-height: 200px;
+  overflow-y: auto;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* ── Inference spark ────────────────────────────── */
+
+.thread-inference {
+  display: flex;
+  align-items: center;
+  padding: var(--space-2) 0;
+  animation: fade-in var(--dur) var(--ease-out);
+}
+
+.thread-inference-spark {
+  width: 18px;
+  height: 18px;
+  transform-origin: center;
+  animation: spark-breathe 1.6s var(--ease) infinite;
+  /* ivory asset → Anthropic orange */
+  filter: brightness(0) saturate(100%) invert(58%) sepia(46%) saturate(638%) hue-rotate(325deg) brightness(92%) contrast(88%);
+}
+
+/* ── Group: wraps multiple parallel threads ─────── */
+/* One bordered container for all parallel subagents; individual
+   threads inside drop their own borders. */
+
+.subagent-group {
+  margin: var(--space-2) var(--space-6);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border));
+  border-radius: var(--radius);
+}
+
+.group-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-1) 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.group-title {
+  flex: 1;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  transition: color var(--dur-fast) var(--ease);
+}
+
+.group-header:hover .group-title {
+  color: var(--text-secondary);
+}
+
+.group-body {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: var(--space-4);
+  padding-top: var(--space-3);
+}
+
+/* Threads inside the group box: no individual border, no margin.
+   Left hairline separates columns without adding weight. */
+.group-body .subagent-thread {
+  margin: 0;
+  padding: 0 0 0 var(--space-3);
+  border: none;
+  border-left: 1px solid var(--border);
+  border-radius: 0;
+}
+.group-body .subagent-thread:first-child {
+  padding-left: 0;
+  border-left: none;
+}

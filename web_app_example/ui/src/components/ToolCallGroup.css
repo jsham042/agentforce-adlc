@@ -1,0 +1,121 @@
+.tool-call-group {
+  margin: var(--space-1) 0;
+}
+
+/* Leading status icon — shared with ToolCallBlock.css */
+.tool-call-group .status-indicator {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  width: 14px;
+}
+.tool-call-group .status-icon.executing { color: var(--info); animation: spin 1s linear infinite; }
+.tool-call-group .status-icon.success   { color: var(--success); }
+.tool-call-group .status-icon.error     { color: var(--error); }
+.tool-call-group .status-icon.pending   { color: var(--text-muted); opacity: 0.4; }
+
+.tool-group-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-1) 0;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  text-align: left;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  transition: color var(--dur-fast) var(--ease);
+}
+
+.tool-group-header:hover {
+  color: var(--text-primary);
+}
+
+.tool-call-group .expand-icon {
+  display: flex;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.group-icon {
+  color: var(--info);
+  flex-shrink: 0;
+}
+
+.tool-count {
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.tool-names {
+  flex: 1;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.status-summary {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  flex-shrink: 0;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 1px var(--space-2);
+  border-radius: var(--radius-pill);
+  font-size: 10.5px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.status-badge.executing { background: color-mix(in srgb, var(--info) 15%, transparent);    color: var(--info); }
+.status-badge.success   { background: color-mix(in srgb, var(--success) 15%, transparent); color: var(--success); }
+.status-badge.error     { background: color-mix(in srgb, var(--error) 15%, transparent);   color: var(--error); }
+.status-badge.pending   { background: var(--bg-tertiary);                                  color: var(--text-muted); }
+
+.status-badge .spinning {
+  animation: spin 1s linear infinite;
+}
+
+.tool-group-content {
+  padding: var(--space-1) 0 var(--space-1) calc(14px + var(--space-2));
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.tool-group-content .tool-call-block {
+  margin: 0;
+}
+
+.tool-group-progress {
+  padding: var(--space-1) 0;
+}
+
+.progress-text {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.progress-text .spinning {
+  color: var(--info);
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

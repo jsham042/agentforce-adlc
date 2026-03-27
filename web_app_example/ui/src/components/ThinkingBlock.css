@@ -1,0 +1,104 @@
+/* Boxless — reads as a muted inline annotation, not a card. */
+.thinking-block {
+  margin: var(--space-1) 0;
+}
+
+.thinking-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-1) 0;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  text-align: left;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  transition: color var(--dur-fast) var(--ease);
+}
+
+.thinking-header:hover {
+  color: var(--text-secondary);
+}
+
+.thinking-header.non-interactive {
+  cursor: default;
+}
+
+.expand-icon {
+  display: flex;
+  color: var(--text-muted);
+}
+
+.thinking-icon {
+  flex-shrink: 0;
+}
+
+.thinking-icon.spinning {
+  animation: spin 1.5s linear infinite;
+}
+
+.thinking-label {
+  font-weight: 500;
+}
+
+.thinking-preview {
+  flex: 1;
+  font-family: var(--font-serif);
+  font-size: 12.5px;
+  font-style: italic;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.thinking-content-wrapper {
+  margin: var(--space-1) 0 var(--space-2) var(--space-2);
+  padding-left: var(--space-3);
+  border-left: 2px solid var(--border);
+}
+
+.thinking-content {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 13.5px;
+  font-style: italic;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  max-height: 400px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Three-dot processing indicator — subtle rise, no bounce */
+.thinking-dots {
+  display: flex;
+  gap: 3px;
+  margin-left: auto;
+}
+
+.thinking-dots .dot {
+  width: 4px;
+  height: 4px;
+  background: currentColor;
+  border-radius: var(--radius-pill);
+  opacity: 0.3;
+  animation: dot-wave 1.4s var(--ease) infinite;
+}
+
+.thinking-dots .dot:nth-child(1) { animation-delay: 0s; }
+.thinking-dots .dot:nth-child(2) { animation-delay: 0.15s; }
+.thinking-dots .dot:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes dot-wave {
+  0%, 60%, 100% { opacity: 0.3; }
+  30%           { opacity: 1; }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

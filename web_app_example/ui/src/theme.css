@@ -1,0 +1,89 @@
+/* ──────────────────────────────────────────────────────────────
+   Salesforce Lightning — ADLC Builder skin
+   Palette and type derived from the Lightning Design System so
+   the web UI feels native next to Setup and Agent Builder.
+   ────────────────────────────────────────────────────────────── */
+
+:root {
+  /* Surfaces — SLDS neutrals */
+  --bg-primary:   #FFFFFF;   /* canvas */
+  --bg-secondary: #F3F3F3;   /* panels, sidebars */
+  --bg-tertiary:  #FAFAF9;   /* cards, inputs */
+  --bg-elevated:  #EEF1F6;   /* hover, active */
+
+  /* Text — SLDS grayscale */
+  --text-primary:   #181818;
+  --text-secondary: #444444;
+  --text-muted:     #747474;
+
+  /* Salesforce blue */
+  --accent:       #0176D3;
+  --accent-hover: #014486;
+  --accent-wash:  rgba(1, 118, 211, 0.10);
+
+  /* Semantic — SLDS feedback palette */
+  --success: #2E844A;
+  --error:   #EA001E;
+  --info:    #0176D3;
+  --caution: #FE9339;
+  --process: #5867E8;   /* Einstein purple — thinking/processing */
+
+  /* Message surfaces */
+  --user-message-bg:      #EEF4FF;
+  --assistant-message-bg: transparent;
+
+  /* Hairlines — SLDS borders */
+  --border:        #DDDBDA;
+  --border-strong: #C9C7C5;
+
+  /* Typography
+     Salesforce Sans isn't redistributable; system stack mimics it. */
+  --font-serif: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-sans:  -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                "Helvetica Neue", Arial, sans-serif;
+  --font-mono:  "SF Mono", "Consolas", "Monaco", ui-monospace, monospace;
+
+  /* Shape — SLDS uses tighter radii than Claude */
+  --radius-sm:   4px;
+  --radius:      6px;
+  --radius-lg:   8px;
+  --radius-pill: 999px;
+
+  /* Motion */
+  --ease:     cubic-bezier(0.25, 0.1, 0.25, 1.0);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-fast: 120ms;
+  --dur:      180ms;
+
+  /* Spacing scale */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+
+  /* ── Legacy aliases — keep component CSS working while
+        migrating. Remove once all components reference the
+        canonical tokens above. ────────────────────────────── */
+  --bg-accent:             var(--bg-elevated);
+  --text-accent:           var(--accent);
+  --user-message-text:     var(--text-primary);
+  --assistant-message-text: var(--text-primary);
+  --border-color:          var(--border);
+  --border-accent:         var(--accent);
+  --input-bg:              #FFFFFF;
+  --input-border:          var(--border);
+  --input-text:            var(--text-primary);
+  --button-bg:             var(--accent);
+  --button-text:           #FFFFFF;
+  --button-hover-bg:       var(--accent-hover);
+  --thinking:              var(--process);
+  --tool-call:             var(--info);
+  --tool-result:           var(--success);
+  --glow:                  var(--accent-wash);
+  --font-family:           var(--font-sans);
+  --border-radius:         var(--radius-sm);
+  --box-shadow:            0 2px 4px rgba(0, 0, 0, 0.08);
+}

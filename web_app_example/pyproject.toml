@@ -1,0 +1,27 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "create-agent-sdk-app"
+version = "0.1.0"
+description = "Reusable infrastructure for building Claude Agent SDK applications"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "anthropic>=0.75.0",
+    "claude-agent-sdk>=0.1.10",
+    "python-dotenv>=1.2.1",
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.32.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["harness"]
+artifacts = ["harness/static/**", "harness/builtin_tools/*.html"]

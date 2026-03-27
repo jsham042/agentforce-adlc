@@ -1,0 +1,107 @@
+.session-list {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+}
+
+.session-list-loading,
+.session-list-error,
+.session-list-empty {
+  padding: var(--space-4);
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.session-list-error {
+  color: var(--error);
+}
+
+.session-list-items {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* Session rows — flat buttons, active gets a wash */
+.session-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--space-2) var(--space-3);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  text-align: left;
+  cursor: pointer;
+  position: relative;
+  transition: background var(--dur-fast) var(--ease);
+}
+
+.session-item:hover {
+  background: var(--bg-tertiary);
+}
+
+.session-item.active {
+  background: var(--accent-wash);
+}
+
+.session-item.active .session-item-title {
+  color: var(--accent);
+}
+
+.session-item-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding-right: var(--space-5);
+}
+
+.session-item-meta {
+  display: flex;
+  gap: var(--space-3);
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.session-meta-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.session-delete-btn {
+  position: absolute;
+  right: var(--space-2);
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity var(--dur-fast) var(--ease),
+              color var(--dur-fast) var(--ease),
+              background var(--dur-fast) var(--ease);
+}
+
+.session-item:hover .session-delete-btn {
+  opacity: 1;
+}
+
+.session-delete-btn:hover {
+  background: var(--bg-elevated);
+  color: var(--error);
+}
