@@ -57,10 +57,13 @@ PY="$SCRIPT_DIR/.venv/bin/python"
 [ -x "$PY" ] || PY="python3"
 "$PY" -m pip --version >/dev/null 2>&1 || "$PY" -m ensurepip --upgrade >/dev/null 2>&1
 
-# Verify harness is installed
-if ! "$PY" -c "import harness" 2>/dev/null; then
-    echo -e "${YELLOW}Installing harness package...${NC}"
-    "$PY" -m pip install -e "$SCRIPT_DIR" -q
+# Verify harness is installed AND points at the vendored copy — a stale
+# sibling install (e.g. create-claude-agent) with the same import name
+# will otherwise shadow our edits silently.
+HARNESS_PATH=$("$PY" -c "import harness; print(harness.__file__)" 2>/dev/null || true)
+if [ -z "$HARNESS_PATH" ] || [[ "$HARNESS_PATH" != "$SCRIPT_DIR"/* ]]; then
+    echo -e "${YELLOW}Installing vendored harness package...${NC}"
+    "$PY" -m pip install -e "$SCRIPT_DIR" --force-reinstall --no-deps -q
 fi
 
 # Install UI dependencies if needed
