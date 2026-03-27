@@ -1,0 +1,270 @@
+.message-list-container {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+.message-list {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: var(--bg-primary);
+}
+
+.messages-wrapper {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: var(--space-6);
+}
+
+/* ── Inline processing spark ─────────────────────── */
+
+.inline-processing {
+  display: flex;
+  align-items: center;
+  padding: var(--space-4) var(--space-6);
+  animation: fade-in var(--dur) var(--ease-out);
+}
+
+.inline-processing-spark {
+  transform-origin: center;
+  animation: spark-breathe 1.6s var(--ease) infinite;
+  color: var(--accent);
+}
+
+@keyframes spark-breathe {
+  0%, 100% { transform: scale(0.9)  rotate(0deg);  opacity: 0.45; }
+  50%      { transform: scale(1.08) rotate(10deg); opacity: 0.95; }
+}
+
+/* ── Empty state — serif welcome ────────────────── */
+
+.message-list.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: var(--space-8) var(--space-5);
+  max-width: 520px;
+}
+
+.empty-icon {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto var(--space-5);
+  color: var(--text-muted);
+  opacity: 0.4;
+}
+
+.empty-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.empty-title {
+  margin: 0 0 var(--space-3);
+  font-family: var(--font-serif);
+  font-size: 26px;
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+.empty-description {
+  margin: 0 0 var(--space-6);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.empty-hints {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-5);
+}
+
+.hint {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 12px;
+}
+
+.hint-key {
+  padding: 3px var(--space-2);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-primary);
+}
+
+.hint-desc {
+  color: var(--text-muted);
+}
+
+/* ── Starter prompts ───────────────────────────── */
+
+.starter-prompts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
+  width: 100%;
+  max-width: 480px;
+}
+
+.starter-prompts-label {
+  grid-column: 1 / -1;
+  margin: 0 0 var(--space-1);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.starter-prompt {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-4);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s, background 0.15s;
+  font-family: var(--font-sans);
+}
+
+.starter-prompt:hover {
+  border-color: var(--accent);
+  background: var(--bg-tertiary);
+}
+
+.starter-prompt-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+
+.starter-prompt-text {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ── Export section ─────────────────────────────── */
+
+.export-section {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: var(--space-3) var(--space-6);
+  padding: var(--space-4);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.export-button {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease);
+}
+
+.export-button:hover:not(:disabled) {
+  background: var(--accent-hover);
+}
+
+.export-button:disabled {
+  background: var(--bg-elevated);
+  color: var(--text-muted);
+  cursor: not-allowed;
+}
+
+.export-button.success {
+  background: var(--success);
+}
+
+.export-button.error {
+  background: var(--bg-elevated);
+  color: var(--error);
+}
+
+.export-button .spinner {
+  animation: spin 1s linear infinite;
+}
+
+.export-link {
+  font-size: 13px;
+  color: var(--accent);
+}
+
+.export-error {
+  font-size: 12px;
+  color: var(--error);
+}
+
+/* ── Scroll-to-bottom floating button ───────────── */
+
+.scroll-to-bottom-btn {
+  position: absolute;
+  bottom: var(--space-5);
+  right: var(--space-5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  color: var(--text-secondary);
+  cursor: pointer;
+  z-index: 100;
+  animation: fade-in var(--dur) var(--ease-out);
+  transition: background var(--dur-fast) var(--ease),
+              border-color var(--dur-fast) var(--ease);
+}
+
+.scroll-to-bottom-btn:hover {
+  background: var(--bg-elevated);
+  border-color: var(--border-strong);
+  color: var(--text-primary);
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

@@ -1,0 +1,317 @@
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.app-body {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+/* ── Sidebars ────────────────────────────────────── */
+
+.sidebar {
+  width: 280px;
+  min-width: 220px;
+  max-width: 350px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  overflow: hidden;
+  background: var(--bg-secondary);
+}
+
+/* Claude.ai-style rail: collapsed shows a slim strip with the toggle,
+   expanded shows full session list. Toggle sits at the top in both states. */
+.sidebar-container {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  width: 280px;
+  background: var(--bg-secondary);
+  border-right: 1px solid var(--border);
+  transition: width var(--dur) var(--ease-out);
+}
+
+.sidebar-container .sidebar-left {
+  width: 100%;
+  min-width: 0;
+  flex: 1;
+  background: transparent;
+  padding-top: 0;
+}
+
+.sidebar-container.collapsed {
+  width: 52px;
+}
+
+.sidebar-container.collapsed .sidebar-left,
+.sidebar-container.collapsed .sidebar-header-row,
+.sidebar-container.collapsed .sidebar-brand-text,
+.sidebar-container.collapsed .sidebar-brand-mark,
+.sidebar-container.collapsed .sidebar-new-chat span {
+  display: none;
+}
+
+.sidebar-right {
+  border-left: 1px solid var(--border);
+}
+
+/* Agent branding — replaces the full-width app header */
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-4) var(--space-3);
+  flex-shrink: 0;
+}
+
+.sidebar-brand-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  background: var(--accent);
+  color: #fff;
+  border-radius: var(--radius);
+}
+
+.sidebar-brand-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.sidebar-brand-title {
+  font-family: var(--font-serif);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sidebar-brand-subtitle {
+  margin-top: 1px;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.sidebar-container.collapsed .sidebar-brand {
+  justify-content: center;
+  padding-inline: 0;
+}
+
+/* Header row: toggle + title side by side */
+.sidebar-header-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-3) var(--space-2);
+  flex-shrink: 0;
+}
+
+.sidebar-title {
+  flex: 1;
+  font-family: var(--font-serif);
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.sidebar-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  flex-shrink: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease),
+              color var(--dur-fast) var(--ease);
+}
+
+.sidebar-icon-btn:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.sidebar-icon-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.sidebar-icon-btn .spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+
+/* New chat — full-width pill below the header row.
+   Collapses to icon-only in the rail. */
+.sidebar-new-chat {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0 var(--space-3) var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  flex-shrink: 0;
+  border-radius: var(--radius);
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease);
+}
+
+.sidebar-new-chat:hover {
+  background: var(--bg-tertiary);
+}
+
+.sidebar-new-chat-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--bg-elevated);
+  flex-shrink: 0;
+}
+
+.sidebar-container.collapsed .sidebar-new-chat {
+  width: 32px;
+  height: 32px;
+  margin-inline: auto;
+  padding: 0;
+  justify-content: center;
+}
+
+/* ── Main panel ──────────────────────────────────── */
+
+.main-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+  background: var(--bg-primary);
+}
+
+/* Slim persistent strip above the chat — mostly whitespace,
+   carries the session title so the conversation is anchored. */
+.chat-header {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-6) var(--space-3);
+  flex-shrink: 0;
+}
+
+.chat-header-title {
+  font-family: var(--font-serif);
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chat-header-meta {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+.resume-session-hint {
+  margin: var(--space-4) var(--space-5);
+  padding: var(--space-3) var(--space-4);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-secondary);
+  font-size: 13px;
+  text-align: center;
+}
+
+/* ── Responsive ──────────────────────────────────── */
+
+@media (max-width: 1024px) {
+  .sidebar {
+    width: 220px;
+    min-width: 180px;
+  }
+  .sidebar-container:not(.collapsed) {
+    width: 220px;
+  }
+}
+
+@media (max-width: 768px) {
+  .app-body {
+    flex-direction: column;
+  }
+
+  .sidebar,
+  .sidebar-container,
+  .sidebar-container.collapsed {
+    width: 100%;
+    max-width: none;
+    min-width: unset;
+    height: auto;
+    max-height: 200px;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .sidebar-container.collapsed .sidebar-left {
+    display: flex;
+  }
+
+  .sidebar-right {
+    border-left: none;
+    border-top: 1px solid var(--border);
+    order: 1;
+  }
+
+  .main-panel {
+    order: 0;
+  }
+
+  .sidebar-header-row {
+    display: none;
+  }
+}

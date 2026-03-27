@@ -1,0 +1,142 @@
+.status-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-2) var(--space-5);
+  background: var(--bg-primary);
+  border-bottom: 1px solid var(--border);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  min-height: 38px;
+}
+
+.status-left,
+.status-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+/* ── Pills ──────────────────────────────────────── */
+
+.connection-status,
+.session-stats,
+.usage-display,
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+}
+
+.connection-status.connected  { border-color: color-mix(in srgb, var(--success) 35%, var(--border)); }
+.connection-status.connecting { border-color: color-mix(in srgb, var(--info) 35%, var(--border)); }
+.connection-status.error      { border-color: color-mix(in srgb, var(--error) 35%, var(--border)); }
+
+.status-icon.connected    { color: var(--success); }
+.status-icon.connecting   { color: var(--info); }
+.status-icon.error        { color: var(--error); }
+.status-icon.disconnected { color: var(--text-muted); }
+.status-icon.spinning     { animation: spin 1s linear infinite; }
+
+/* ── Activity ───────────────────────────────────── */
+
+.activity-indicator {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--text-secondary);
+}
+
+.activity-indicator .spinning {
+  color: var(--info);
+  animation: spin 1s linear infinite;
+}
+
+.active-tools {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.tools-label {
+  color: var(--text-muted);
+}
+
+.tool-badge {
+  padding: 1px var(--space-2);
+  background: var(--accent-wash);
+  border-radius: var(--radius-sm);
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 500;
+}
+
+/* ── Stats ──────────────────────────────────────── */
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--text-secondary);
+}
+
+.stat-item svg {
+  color: var(--text-muted);
+}
+
+/* ── Theme toggle / settings ────────────────────── */
+
+.theme-toggle {
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease);
+}
+
+.theme-toggle:hover {
+  background: var(--bg-elevated);
+}
+
+.theme-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+}
+
+.theme-label {
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+.theme-name {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.settings-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease),
+              color var(--dur-fast) var(--ease);
+}
+
+.settings-button:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
