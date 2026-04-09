@@ -1,0 +1,35 @@
+agent:
+   name: OrderSupportAgent
+   description: Helps customers with order status and refunds.
+
+variables:
+   order_id:
+      type: text
+      description: The order the customer is asking about.
+   refund_eligible:
+      type: boolean
+      description: Whether the order qualifies for a refund.
+
+actions:
+   LookupOrder:
+      description: Fetch an order record by id.
+      inputs: { order_id: text }
+   InitiateRefund:
+      description: Start a refund for an order.
+      inputs: { order_id: text }
+
+topics:
+   Refunds:
+      description: Handle refund requests.
+      instruction: >
+         Be empathetic. Confirm the order, explain the policy clearly,
+         and never promise a refund before eligibility is checked.
+      reasoning:
+         - run @actions.LookupOrder(order_id=@vars.order_id)
+         - if @outputs.LookupOrder["status"] == "Delivered" and @outputs.LookupOrder["days_since_delivery"] <= 30
+         -    set @vars.refund_eligible = True
+         -    run @actions.InitiateRefund(order_id=@vars.order_id)
+         -    respond "Your refund has been started. You'll see it in 3-5 business days."
+         - else
+         -    set @vars.refund_eligible = False
+         -    instruction "Explain the 30-day return window and offer alternatives."

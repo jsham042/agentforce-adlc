@@ -1,0 +1,206 @@
+# PROPOSED SYNTAX — not yet supported by the Agent Script compiler.
+# Shows BofAGrowthEngine with two top-level `claude <Name>:` blocks replacing
+# the prompt:// design_campaign and run_postmortem actions.
+# Only the changed portions are shown; the rest of the agent is unchanged
+# from force-app/main/default/aiAuthoringBundles/BofAGrowthEngine/BofAGrowthEngine.agent
+
+# ───────────────────────────────────────────────────────────────────────────
+# NEW: top-level claude blocks (peers to topic / start_agent)
+# ───────────────────────────────────────────────────────────────────────────
+
+claude CampaignDesigner:
+	description: "Iteratively design a personalized multi-channel acquisition campaign brief for a qualified prospect or cohort"
+	model: "sonnet"
+	max_turns: 8
+	max_budget_usd: 0.50
+	on_exhaustion: "fault"
+	tools:
+		- "flow://BofA_Get_Customer360_Profile"
+		- "flow://BofA_Get_Brand_Guidelines"
+		- "apex://BudgetEstimator"
+	hooks:
+		pre_tool_use: "apex://BofAComplianceGuard"
+		post_tool_use: "apex://BofAPIIRedactor"
+	prompt: |
+		You design acquisition campaign briefs for qualified Bank of America prospects.
+		Use the C360 profile tool to understand the prospect's signals and channel preferences.
+		Check brand guidelines before drafting creative. Estimate budget with the estimator tool.
+		Iterate until the brief is specific, on-brand, and UDAAP-compliant.
+		Never reference age, race, zip code, gender, or any protected-class attribute or proxy.
+		Return only the campaign_brief and proposed_budget.
+	inputs:
+		prospect_id: string
+			description: "Prospect ID (blank if cohort-level)"
+		cohort_id: string
+			description: "Cohort ID (blank if single-prospect)"
+		ltv_tier: string
+			description: "high, medium, or low"
+		trigger_event: string
+			description: "Qualifying life event to anchor messaging on"
+		recommended_channels: string
+			description: "Preferred outreach channels"
+	outputs:
+		campaign_brief: string
+			description: "Generated campaign brief: audience, channels, messaging angle, offer"
+		proposed_budget: object
+			complex_data_type_name: "lightning__numberType"
+			description: "Proposed spend in USD"
+
+claude PostmortemAnalyst:
+	description: "Analyze campaign performance, find what worked, and produce recommendations to feed upstream"
+	model: "sonnet"
+	max_turns: 12
+	max_budget_usd: 0.75
+	on_exhaustion: "partial"
+	tools:
+		- "flow://BofA_Get_Campaign_Results"
+		- "flow://BofA_Compare_Cohort_Performance"
+	hooks:
+		post_tool_use: "apex://BofAPIIRedactor"
+	prompt: |
+		You run post-mortems on BofA acquisition campaigns.
+		Pull results, compare against similar cohorts, form hypotheses about what drove
+		conversion or drop-off, and test them against the data. Produce a concise summary
+		of findings and concrete recommendations for trigger detection and campaign design.
+	inputs:
+		campaign_id: string
+			description: "Campaign to analyze"
+	outputs:
+		postmortem_summary: string
+			description: "Findings and recommendations"
+
+# ───────────────────────────────────────────────────────────────────────────
+# CHANGED: router can now route directly to a claude block
+# ───────────────────────────────────────────────────────────────────────────
+
+start_agent growth_router:
+	description: "Route marketer requests to the appropriate growth-funnel capability"
+	reasoning:
+		instructions: |
+			You are a router only. Do NOT answer questions or perform work directly.
+			Always use a transition action to route immediately.
+		actions:
+			to_triggers: @utils.transition to @topic.event_triggers
+				description: "Scan for life-event triggers or pull newly qualified cohorts"
+			to_qualification: @utils.transition to @topic.prospect_qualification
+				description: "Build a profile and qualify a prospect"
+			to_campaign: @utils.transition to @topic.campaign_execution
+				description: "Design, approve, or launch a campaign"
+			to_design_direct: @utils.transition to @claude.CampaignDesigner
+				description: "Go straight to campaign design for an already-qualified prospect"
+				available when @variables.qualification_status == "qualified" and @variables.dnc_flag == False
+			to_outcomes: @utils.transition to @topic.outcome_learning
+				description: "Record outcomes and run post-mortem analysis"
+
+# ───────────────────────────────────────────────────────────────────────────
+# CHANGED: campaign_execution delegates to @claude.CampaignDesigner
+#          (replaces the old prompt:// design_campaign action definition)
+# ───────────────────────────────────────────────────────────────────────────
+
+topic campaign_execution:
+	label: "Campaign Execution"
+	description: "Design a campaign via the agentic designer, route for approval, launch once approved"
+
+	actions:
+		submit_approval:
+			description: "Submit the campaign brief to the marketer approval workflow"
+			target: "flow://BofA_Submit_Campaign_Approval"
+			inputs:
+				campaign_brief: string
+				proposed_budget: object
+					complex_data_type_name: "lightning__numberType"
+				requires_senior_approval: boolean
+			outputs:
+				campaign_id: string
+				approval_status: string
+		launch_campaign:
+			description: "Launch an approved campaign"
+			target: "flow://BofA_Launch_Campaign"
+			inputs:
+				campaign_id: string
+			outputs:
+				launch_status: string
+
+	reasoning:
+		instructions: ->
+			if @variables.approval_status == "approved":
+				| Campaign {!@variables.campaign_id} is approved. Ready to launch.
+			| I'll generate a campaign brief, then submit it for marketer approval before any launch.
+
+		actions:
+			generate_brief: @claude.CampaignDesigner
+				description: "Delegate brief generation to the agentic designer; return here for approval"
+				available when @variables.dnc_flag == False
+				with prospect_id = @variables.prospect_id
+				with cohort_id = @variables.cohort_id
+				with ltv_tier = @variables.ltv_tier
+				with trigger_event = @variables.trigger_event
+				with recommended_channels = @variables.recommended_channels
+				set @variables.campaign_brief = @outputs.campaign_brief
+				set @variables.campaign_budget = @outputs.proposed_budget
+			send_for_approval: @actions.submit_approval
+				description: "Submit for marketer approval (required before launch)"
+				available when @variables.campaign_brief != ""
+				with campaign_brief = @variables.campaign_brief
+				with proposed_budget = @variables.campaign_budget
+				with requires_senior_approval = ...
+				set @variables.campaign_id = @outputs.campaign_id
+				set @variables.approval_status = @outputs.approval_status
+			go_live: @actions.launch_campaign
+				description: "Launch the approved campaign"
+				available when @variables.approval_status == "approved"
+				with campaign_id = @variables.campaign_id
+			back: @utils.transition to @topic.main_menu
+				description: "Return to main menu"
+
+# ───────────────────────────────────────────────────────────────────────────
+# CHANGED: outcome_learning delegates to @claude.PostmortemAnalyst
+# ───────────────────────────────────────────────────────────────────────────
+
+topic outcome_learning:
+	label: "Outcome & Learning"
+	description: "Record outcomes, run agentic post-mortem, feed learnings upstream"
+
+	actions:
+		record_outcome:
+			description: "Record the terminal outcome for a prospect and campaign"
+			target: "flow://BofA_Record_Prospect_Outcome"
+			inputs:
+				prospect_id: string
+				campaign_id: string
+				outcome_type: string
+			outputs:
+				outcome_record_id: string
+		feed_learnings:
+			description: "Submit post-mortem learnings to the upstream feedback service"
+			target: "apex://BofALearningFeedbackService"
+			inputs:
+				campaign_id: string
+				postmortem_summary: string
+			outputs:
+				feedback_id: string
+
+	reasoning:
+		instructions: ->
+			if @variables.postmortem_summary != "":
+				| Post-mortem for campaign {!@variables.campaign_id}:
+				| {!@variables.postmortem_summary}
+			| I can record an outcome, run a post-mortem, or feed learnings upstream.
+
+		actions:
+			log_outcome: @actions.record_outcome
+				description: "Record the terminal outcome"
+				with prospect_id = ...
+				with campaign_id = ...
+				with outcome_type = ...
+			analyze: @claude.PostmortemAnalyst
+				description: "Run agentic post-mortem; return here to feed learnings"
+				with campaign_id = ...
+				set @variables.postmortem_summary = @outputs.postmortem_summary
+			submit_learnings: @actions.feed_learnings
+				description: "Feed learnings back to upstream models"
+				available when @variables.postmortem_summary != ""
+				with campaign_id = @variables.campaign_id
+				with postmortem_summary = @variables.postmortem_summary
+			back: @utils.transition to @topic.main_menu
+				description: "Return to main menu"

@@ -60,7 +60,7 @@ PY="$SCRIPT_DIR/.venv/bin/python"
 # Verify harness is installed AND points at the vendored copy — a stale
 # sibling install (e.g. create-claude-agent) with the same import name
 # will otherwise shadow our edits silently.
-HARNESS_PATH=$("$PY" -c "import harness; print(harness.__file__)" 2>/dev/null || true)
+HARNESS_PATH=$(cd /tmp && "$PY" -c "import harness; print(harness.__file__)" 2>/dev/null || true)
 if [ -z "$HARNESS_PATH" ] || [[ "$HARNESS_PATH" != "$SCRIPT_DIR"/* ]]; then
     echo -e "${YELLOW}Installing vendored harness package...${NC}"
     "$PY" -m pip install -e "$SCRIPT_DIR" --force-reinstall --no-deps -q
